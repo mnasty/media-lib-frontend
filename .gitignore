@@ -40,6 +40,5 @@ migrations/*
 
 # Misc
 *.tar.gz
-.replit
 .cache
 .idea
