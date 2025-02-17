@@ -48,3 +48,7 @@ export const videoMetadataSchema = z.object({
 });
 
 export type VideoMetadata = z.infer<typeof videoMetadataSchema>;
+
+export interface Config {
+    sambaSharePath: string;
+}

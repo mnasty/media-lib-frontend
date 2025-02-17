@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { VideoPlayer } from "@/components/video-player";
-import { type Video } from "@shared/schema";
+import { type Video, type Config } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
@@ -9,22 +9,27 @@ import { Link } from "wouter";
 export default function Player() {
   const [, params] = useRoute("/player/:id");
   const videoId = params?.id;
-
-  const { data: video, isLoading } = useQuery<Video>({
-    queryKey: [`/api/videos/${videoId}`],
-    enabled: !!videoId,
+  
+  const { data: video, error: videoError } = useQuery<Video>({
+    queryKey: ['video', videoId],
+    queryFn: async () => {
+      const response = await fetch(`/api/videos/${videoId}`);
+      if (!response.ok) throw new Error('Video not found');
+      return response.json();
+    }
   });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (videoError) {
+    console.error("Video fetch error:", videoError);
+    return <div>Error loading video: {videoError.message}</div>;
   }
 
   if (!video) {
-    return <div>Video not found</div>;
+    return <div>Loading video...</div>;
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="p-4">
       <div className="mb-4">
         <Link href="/">
           <Button variant="ghost" className="gap-2">
